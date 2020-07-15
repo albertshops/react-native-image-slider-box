@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Video from 'react-native-video'
 import {
   View,
   Image,
@@ -70,10 +71,11 @@ export class SliderBox extends Component {
     } = this.props;
     return (
       <View
-        style={{
-          position: "relative",
-          justifyContent: "center"
-        }}
+        style={[{
+				justifyContent: 'center',
+			},
+			ImageComponentStyle
+		]}
       >
         <TouchableHighlight
           key={index}
@@ -81,27 +83,49 @@ export class SliderBox extends Component {
           onPress={this.onCurrentImagePressedHandler}
           underlayColor={'transparent'}
         >
-          <ImageComponent
-            style={[
-              {
-                width: "100%",
-                height: sliderBoxHeight || 200,
-                alignSelf: "center"
-              },
-              ImageComponentStyle
-            ]}
-            source={typeof item === "string" ? { uri: item } : item}
-            resizeMethod={resizeMethod || "resize"}
-            resizeMode={resizeMode || "cover"}
-            onLoad={() => {}}
-            onLoadStart={() => {}}
-            onLoadEnd={() => {
-              let t = this.state.loading;
-              t[index] = true;
-              this.setState({ loading: t });
-            }}
-            {...this.props}
-          />
+			<>
+				{item.uri.endsWith('.mp4') &&
+					<Video
+						source={ item }
+						style={[{
+								width: "100%",
+								height: sliderBoxHeight || 200,
+								alignSelf: "center"
+							},
+							ImageComponentStyle,
+						]}
+						onLoad={() => {
+							let t = this.state.loading;
+							t[index] = true;
+							this.setState({ loading: t });
+						}}
+					/>
+				}
+
+				{ !(item.uri.endsWith('.mp4')) &&
+					<ImageComponent
+						style={[
+						{
+							width: "100%",
+							height: sliderBoxHeight || 200,
+							alignSelf: "center"
+						},
+						ImageComponentStyle
+						]}
+						source={typeof item === "string" ? { uri: item } : item}
+						resizeMethod={resizeMethod || "resize"}
+						resizeMode={resizeMode || "cover"}
+						onLoad={() => {}}
+						onLoadStart={() => {}}
+						onLoadEnd={() => {
+						let t = this.state.loading;
+						t[index] = true;
+						this.setState({ loading: t });
+						}}
+						{...this.props}
+					/>
+				}
+			</>
         </TouchableHighlight>
         {!this.state.loading[index] && (
           <ActivityIndicator
@@ -160,7 +184,9 @@ export class SliderBox extends Component {
       loopClonesPerSide
     } = this.props;
     return (
-      <View>
+      <View style={{
+		  borderColor: 'yellow',
+	  }}>
         <Carousel
           layout={"default"}
           data={images}
